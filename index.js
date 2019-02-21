@@ -1,160 +1,117 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+var fs = require('fs');
 
 var port = 2000;
-var app = express({defaultErrorHandler:false});
-app.use(cors())
 
+var app = express({defaultErrorHandler:false});
+
+app.use(cors())
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 app.use(express.static('public'))
-
-const mysql = require('mysql')
+const mysql = require('mysql');
 
 const conn = mysql.createConnection({
     host:'localhost',
-    user: 'apriano',
-    password:'@Apriano11307001',
-    database:'maxxCorner',
-    port:3306 
+    user:'root',
+    password:'ano11307001',
+    database:'moviebertasbih',
+    port: 2000
 });
-app.get('/', (req,res)=>{
-    res.send("<h1>jalan</h1>")
+
+
+app.get('/', (req,res) => {
+    res.send('<h1>Ini Homepage</h1>')   
 })
 
-//user
-app.get('/users' , (req, res) => {
-    var sql = 'select * from users;'
-    conn.query(sql ,(err,result)=>{
-        res.send(result)
-        console.log(result)
-    })
-})  
-
-app.post('/register' , (req, res) => {
-    var newUsers = req.body
-    var sql =`insert into users set ?`
-    conn.query(sql ,newUsers,(err,result)=>{
-        console.log(result)
-        res.send(result)
-    })
-})
-
-app.post('/edit-profile/:id', (req, res) => {
-    var editUser = req.body
-    var sql = `update users set ? where id = ${req.params.id}`
-    conn.query(sql, editUser,(err,result)=>{
-        res.send(result)
-    })
-})
-
-app.post('/delete-user/:id', (req, res) => {
-    var sql = `delete from users where id = ${req.params.id}`
-    conn.query(sql, (err,result)=>{
-        res.send(result)
-    })
-})
-
-//ambil data product
-app.get('/popok' , (req, res) => {
-    var sql = 'select * from products;'
-    conn.query(sql ,(err,result) => {
-        console.log(result)
-        res.send(result)
-    })
-})
-
-app.post('/popok-insert' , (req, res) => {
-    var newProduct = req.body
-    var sql =`insert into products set ?`
-    conn.query(sql ,newProduct,(err, result) => {
-        console.log(result)
-        res.send(result)
-    })
-})
-
-app.post('/popok-edit/:id', (req, res) => {
-    var editProducts =req.body
-    var sql = `update products set ? where id_products=${req.params.id}`
-    conn.query(sql, editProducts, (err, result) => {
-        res.send(result)
-    })
-})
-
-app.post('/popok-delete/:id', (req, res) => {
-    var sql = `delete from products where id_products = ${req.params.id}`
-    conn.query(sql, (err, result) => {
-        res.send(result)
-    })
-})
-
-//ambil data categories
-app.get('/categories' , (req, res) => {
-    var sql = 'select * from categories;'
-    conn.query(sql ,(err,result) => {
-        console.log(result)
-        res.send(result)
-    })
-})
-
-app.post('/categories-insert' , (req, res) => {
-    var newCategories = req.body
-    var sql =`insert into products set ?`
-    conn.query(sql ,newCategories,(err, result) => {
-        console.log(result)
-        res.send(result)
-    })
-})
-
-app.post('/categories-edit/:id', (req, res) => {
-    var editCategories =req.body
-    var sql = `update products set ? where id_products=${req.params.id}`
-    conn.query(sql, editCategories, (err, result) => {
-        res.send(result)
-    })
-})
-
-app.post('/categories-delete/:id', (req, res) => {
-    var sql = `delete from products where id_products = ${req.params.id}`
-    conn.query(sql, (err, result) => {
-        res.send(result)
-    })
-})
-
-//connect movies dan categories
-app.post('/movies-categories', (req, res) => {
-    var newCart = req.body
-    var sql =`insert into cart set ?`
-    conn.query(sql, newCart, (err, result) => {
-        console.log(result)
-        res.send(result)
-    })
-})
-
-app.post('/movies-categories-edit/:id', (req, res) => {
-    var newChart =req.body
-    var sql = `update cart set ? where id_cart= ${req.params.id}`
-    conn.query(sql, newChart, (err, result) => {
+//backend tablekamar dimulai
+//read data list kamar
+app.get('/listkamar' , (req,res) => {
+    var sql = 'select * from hotelbertasbih.kamar;'
+    conn.query(sql, (err, result)=>{
         res.send(result)
         console.log(result)
     })
 })
 
-app.post('/movies-categories-delete/:id', (req, res) => {
-    var sql = `delete from cart where id_cart = ${req.params.id}`
-    conn.query(sql, (err, result) => {
+//edit data list kamar
+app.post('/kamaredit/:id',(req,res)=>{
+    var editKamar = req.body
+    var sql = `update kamar? where id=${req.params.id}`;
+    conn.query(sql, editKamar, (err, result)=>{
         res.send(result)
         console.log(result)
     })
 })
 
-app.get('/movies-categories', (req, res) => {
-    var sql = 'select us.username as username, pr.nama as nama, pr.harga as harga from cart ch join users us on ch.id_user = us.id join products pr on ch.id_products = pr.id_products '
-    conn.query(sql ,(err,result) => {
-        console.log(result)
+//delete data kamar dan connection
+app.post('/kamardelete/:id',(req,res)=>{
+    var sql = `delete from list where id=${req.params.id}`;
+    conn.query(sql, (err, result)=>{
         res.send(result)
     })
+    var sql2 = `delete from category kamar where idmovie=${req.params.id}`;
+    conn.query(sql2, (err, results)=>{
+        console.log(results)
+    })
 })
+
+//create data kamar
+app.post('/kamaradd',(req,res)=>{
+    var addKamar = req.body
+    var sql = `insert into movies set ?`;
+    conn.query(sql, addKamar, (err, result)=>{
+        res.send(result)
+        console.log(result)
+    })
+})
+
+//akhir backend tablekamar
+
+//tablecategory dimulai
+//add category
+app.post('/categoryadd',(req,res)=>{
+    var addCategories = req.body
+    var sql = `insert into categories set?`;
+    conn.query(sql, addCategories, (err, result)=>{
+        res.send(result)
+        console.log(result)
+    })
+})
+
+//edit category
+app.post('/categoryedit/:id',(req,res)=>{
+    var editCategory = req.body
+    var sql = `update category set? where id=${req.params.id}`;
+    conn.query(sql, editCategory,(err,result)=>{
+        res.send(result)
+        console.log(result)
+    })
+})
+
+//read data category
+app.get('/categorylist' , (req,res) => {
+    var sql = 'select * from hotelbertasbih.tablecategory;'
+    conn.query(sql, (err, result)=>{
+        res.send(result)
+        console.log(result)
+    })
+})
+
+//delete data category
+app.post('/categorydelete/:id',(req,res)=>{
+    var sql = `delete from category where id=${req.params.id}`;
+    conn.query(sql, (err, result)=>{
+        res.send(result)
+        console.log(result)
+    })
+    var sql2 = `delete from category kamar where idcategory=${req.params.id}`;
+    conn.query(sql2, (err, results)=>{
+        console.log(results)
+    })
+})
+//akhir backend tablecategory
 
 app.listen(port, () => console.log('API Aktif di port ' + port))
